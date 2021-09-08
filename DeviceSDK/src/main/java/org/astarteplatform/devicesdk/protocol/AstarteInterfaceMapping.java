@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+
+import org.astarteplatform.devicesdk.transport.AstarteTransportException;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,42 +15,7 @@ public class AstarteInterfaceMapping {
   private String path;
   private Type type;
 
-  private static final Collection<Collection<Type>> mTypeCompatibilityList = new HashSet<>();
-
-  static {
-    Collection<Type> numberCompatibilityList = new HashSet<>();
-    numberCompatibilityList.add(int.class);
-    numberCompatibilityList.add(long.class);
-    numberCompatibilityList.add(float.class);
-    numberCompatibilityList.add(double.class);
-    numberCompatibilityList.add(Integer.class);
-    numberCompatibilityList.add(Long.class);
-    numberCompatibilityList.add(BigInteger.class);
-    numberCompatibilityList.add(Float.class);
-    numberCompatibilityList.add(Double.class);
-
-    Collection<Type> booleanCompatibilityList = new HashSet<>();
-    booleanCompatibilityList.add(boolean.class);
-    booleanCompatibilityList.add(Boolean.class);
-
-    Collection<Type> stringCompatibilityList = new HashSet<>();
-    booleanCompatibilityList.add(String.class);
-
-    Collection<Type> dateTimeCompatibilityList = new HashSet<>();
-    dateTimeCompatibilityList.add(DateTime.class);
-
-    Collection<Type> byteArrayCompatibilityList = new HashSet<>();
-    byteArrayCompatibilityList.add(byte[].class);
-    byteArrayCompatibilityList.add(Byte[].class);
-
-    mTypeCompatibilityList.add(numberCompatibilityList);
-    mTypeCompatibilityList.add(booleanCompatibilityList);
-    mTypeCompatibilityList.add(stringCompatibilityList);
-    mTypeCompatibilityList.add(dateTimeCompatibilityList);
-    mTypeCompatibilityList.add(byteArrayCompatibilityList);
-  };
-
-  static AstarteInterfaceMapping fromJSON(JSONObject astarteMappingObject) throws JSONException {
+  protected static AstarteInterfaceMapping fromJSON(JSONObject astarteMappingObject) throws JSONException {
     AstarteInterfaceMapping astarteInterfaceMapping = new AstarteInterfaceMapping();
     astarteInterfaceMapping.parseMappingFromJSON(astarteMappingObject);
     return astarteInterfaceMapping;
@@ -67,25 +34,30 @@ public class AstarteInterfaceMapping {
     return type;
   }
 
-  boolean isTypeCompatible(Type otherType) {
-    // Here is our long and boring compatibility map.
-    for (Collection<Type> compatibilityList : mTypeCompatibilityList) {
-      if (compatibilityList.contains(otherType) && compatibilityList.contains(getType())) {
-        return true;
-      }
-    }
-    return false;
+  protected boolean isTypeCompatible(Type otherType) {
+    return (getType() == otherType);
   }
 
-  boolean isTypeCompatible(String astarteType) {
-    // Here is our long and boring compatibility map.
-    for (Collection<Type> compatibilityList : mTypeCompatibilityList) {
-      if (compatibilityList.contains(stringToJavaType(astarteType))
-          && compatibilityList.contains(getType())) {
-        return true;
-      }
+  public void validatePayload(Object payload)
+          throws AstarteInvalidValueException {
+    if (!isTypeCompatible(payload.getClass())) {
+      throw new AstarteInvalidValueException(String.format("Value incompatible with parameter type for %s: %s expected, %s found"
+              , getPath(),
+              getType(),
+              payload.getClass()));
     }
-    return false;
+    if(payload instanceof Double && ((Double) payload).isNaN()){
+      throw new AstarteInvalidValueException(String.format("Value per %s cannot be NaN", getPath()));
+    }
+  }
+
+  public void validatePayload(Object payload, DateTime timestamp) throws AstarteInvalidValueException {
+    validatePayload(payload);
+    if (timestamp != null) {
+      // FIXME: Maybe go easier, and just throw a warning?
+      throw new AstarteInvalidValueException(
+              "When sending a property, explicit timestamp " + "is always ignored");
+    }
   }
 
   private static Type stringToJavaType(String typeString) {

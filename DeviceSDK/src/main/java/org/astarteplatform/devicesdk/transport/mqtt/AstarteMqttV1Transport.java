@@ -20,23 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.zip.InflaterInputStream;
 import org.astarteplatform.devicesdk.AstartePropertyStorageException;
-import org.astarteplatform.devicesdk.protocol.AstarteAggregateDatastreamEvent;
-import org.astarteplatform.devicesdk.protocol.AstarteAggregateDatastreamEventListener;
-import org.astarteplatform.devicesdk.protocol.AstarteAggregateDatastreamInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteDatastreamEvent;
-import org.astarteplatform.devicesdk.protocol.AstarteDatastreamEventListener;
-import org.astarteplatform.devicesdk.protocol.AstarteDatastreamInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteDevicePropertyInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteInterfaceDatastreamMapping;
-import org.astarteplatform.devicesdk.protocol.AstarteInterfaceMapping;
-import org.astarteplatform.devicesdk.protocol.AstarteInterfaceMappingNotFoundException;
-import org.astarteplatform.devicesdk.protocol.AstartePropertyEvent;
-import org.astarteplatform.devicesdk.protocol.AstartePropertyEventListener;
-import org.astarteplatform.devicesdk.protocol.AstarteProtocolType;
-import org.astarteplatform.devicesdk.protocol.AstarteServerAggregateDatastreamInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteServerDatastreamInterface;
-import org.astarteplatform.devicesdk.protocol.AstarteServerPropertyInterface;
+import org.astarteplatform.devicesdk.protocol.*;
 import org.astarteplatform.devicesdk.transport.AstarteFailedMessage;
 import org.astarteplatform.devicesdk.transport.AstarteFailedMessageStorage;
 import org.astarteplatform.devicesdk.transport.AstarteTransportException;
@@ -352,9 +336,7 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport {
     if (astarteInterface instanceof AstarteDatastreamInterface) {
       try {
         // Find a matching mapping
-        mapping =
-            (AstarteInterfaceDatastreamMapping)
-                AstarteInterface.findMappingInInterface(astarteInterface, path);
+        mapping = (AstarteInterfaceDatastreamMapping) astarteInterface.findMappingInInterface(path);
       } catch (AstarteInterfaceMappingNotFoundException e) {
         throw new AstarteTransportException("Mapping not found", e);
       }

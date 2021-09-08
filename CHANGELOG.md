@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.1.0-dev] - Unreleased
 ### Changed
+- Refactor data validation
 - Update Gradle to latest stable 7.2
+- Add congruency check before send
 - [android] Update Android Gradle plugin and Android target version
 
 ## [1.0.0] - 2021-07-02
