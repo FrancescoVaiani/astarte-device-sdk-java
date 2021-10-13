@@ -13,6 +13,8 @@ import java.util.Optional;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
 import org.astarteplatform.devicesdk.crypto.AstarteCryptoStore;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.AstarteProtocolType;
 import org.astarteplatform.devicesdk.transport.AstarteTransport;
 import org.astarteplatform.devicesdk.transport.AstarteTransportFactory;
@@ -21,6 +23,8 @@ import org.json.JSONObject;
 
 /** This is the class responsible for communicating with Astarte Pairing API. */
 public final class AstartePairingService {
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
+
   private HttpUrl m_pairingUrl;
   private final String m_astarteRealm;
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -135,7 +139,7 @@ public final class AstartePairingService {
     JSONObject transportObjects;
     try (Response response = m_httpClient.newCall(request).execute()) {
       String responseBody = response.body().string();
-      System.out.println(responseBody);
+      logger.debug(responseBody);
       JSONObject responseJson = new JSONObject(responseBody);
       transportObjects = responseJson.getJSONObject("data").getJSONObject("protocols");
     } catch (NullPointerException e) {
@@ -154,7 +158,7 @@ public final class AstartePairingService {
       String key = keys.next();
       AstarteProtocolType protocolType = AstarteProtocolType.fromString(key);
       if (protocolType == null) {
-        System.out.println("Found unsupported protocol " + key);
+        logger.error("Found unsupported protocol " + key);
         continue;
       }
 

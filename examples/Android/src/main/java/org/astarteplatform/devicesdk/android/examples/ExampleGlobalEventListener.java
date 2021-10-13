@@ -1,13 +1,14 @@
 package org.astarteplatform.devicesdk.android.examples;
 
-import android.util.Log;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.AstarteAggregateDatastreamEvent;
 import org.astarteplatform.devicesdk.protocol.AstarteDatastreamEvent;
 import org.astarteplatform.devicesdk.protocol.AstarteGlobalEventListener;
 import org.astarteplatform.devicesdk.protocol.AstartePropertyEvent;
 
 public class ExampleGlobalEventListener extends AstarteGlobalEventListener {
-  private String TAG = "ExampleGlobalEventsListener";
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
   private static final String COMMANDS_INTERFACE =
       "org.astarte-platform.genericcommands.ServerCommands";
   private MainActivity mActivity;
@@ -31,8 +32,7 @@ public class ExampleGlobalEventListener extends AstarteGlobalEventListener {
       /*
        * Otherwise, we just print what we receive
        */
-      Log.i(
-          TAG,
+      logger.info(
           "Received datastream value on interface "
               + e.getInterfaceName()
               + ", path: "
@@ -48,8 +48,7 @@ public class ExampleGlobalEventListener extends AstarteGlobalEventListener {
      * This function gets called when the device receives data on a server owned
      * datastream interface with object aggregation.
      */
-    Log.i(
-        TAG,
+    logger.info(
         "Received aggregate datastream value on interface "
             + e.getInterfaceName()
             + ", values: "
@@ -62,8 +61,7 @@ public class ExampleGlobalEventListener extends AstarteGlobalEventListener {
      * This function gets called when the device receives data on a server owned
      * properties interface.
      */
-    Log.i(
-        TAG,
+    logger.info(
         "Received property on interface "
             + e.getInterfaceName()
             + ", path: "
@@ -78,6 +76,6 @@ public class ExampleGlobalEventListener extends AstarteGlobalEventListener {
      * This function gets called when the device receives an unset on a server owned
      * properties interface.
      */
-    Log.i(TAG, "Received unset on interface " + e.getInterfaceName() + ", path: " + e.getPath());
+    logger.info("Received unset on interface " + e.getInterfaceName() + ", path: " + e.getPath());
   }
 }

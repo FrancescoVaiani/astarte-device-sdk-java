@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.zip.InflaterInputStream;
 import org.astarteplatform.devicesdk.AstartePropertyStorageException;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.*;
 import org.astarteplatform.devicesdk.transport.AstarteFailedMessage;
 import org.astarteplatform.devicesdk.transport.AstarteFailedMessageStorage;
@@ -21,6 +23,8 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.joda.time.DateTime;
 
 public class AstarteMqttV1Transport extends AstarteMqttTransport implements MqttCallbackExtended {
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
+
   private final String m_baseTopic;
   private final BSONDecoder mBSONDecoder = new BasicBSONDecoder();
   private final BSONCallback mBSONCallback = new BasicBSONCallback();
@@ -28,9 +32,9 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
   @Override
   public void connectComplete(boolean reconnect, String serverURI) {
     if (reconnect) {
-      System.out.println("Reconnected to : " + serverURI);
+      logger.info("Reconnected to : " + serverURI);
     } else {
-      System.out.println("Connected to: " + serverURI);
+      logger.info("Connected to: " + serverURI);
     }
   }
 
@@ -39,13 +43,13 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
     if (m_astarteTransportEventListener != null) {
       m_astarteTransportEventListener.onTransportDisconnected();
     } else {
-      System.out.println("The Connection was lost.");
+      logger.error("The Connection was lost.");
     }
   }
 
   @Override
   public void messageArrived(String topic, MqttMessage message) throws AstarteTransportException {
-    System.out.println("Incoming message: " + new String(message.getPayload()));
+    logger.debug("Incoming message: " + new String(message.getPayload()));
     if (!topic.contains(m_baseTopic) || m_messageListener == null) {
       return;
     }
@@ -57,7 +61,7 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
       if (Objects.equals(path, "control/consumer/properties")) {
         handlePurgeProperties(message.getPayload());
       } else {
-        System.err.println("Unhandled control message!" + path);
+        logger.error("Unhandled control message!" + path);
       }
       return;
     }
@@ -67,7 +71,7 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
 
     // Identify in our introspection whether the interface exists
     if (!getDevice().hasInterface(astarteInterface)) {
-      System.err.println("Got an unexpected interface! " + astarteInterface);
+      logger.error("Got an unexpected interface! " + astarteInterface);
       return;
     }
 
@@ -105,7 +109,7 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
           removePropertyFromStorage(astarteInterface, interfacePath);
         }
       } catch (AstartePropertyStorageException e) {
-        System.err.println("AstartePropertyStorageException: Caching won't work " + e.getMessage());
+        logger.warning("AstartePropertyStorageException: Caching won't work " + e.getMessage());
       }
     }
 
@@ -484,7 +488,7 @@ public class AstarteMqttV1Transport extends AstarteMqttTransport implements Mqtt
     if (m_astarteTransportEventListener != null) {
       m_astarteTransportEventListener.onTransportConnected();
     } else {
-      System.out.println("Transport Connected");
+      logger.info("Transport Connected");
     }
   }
 }

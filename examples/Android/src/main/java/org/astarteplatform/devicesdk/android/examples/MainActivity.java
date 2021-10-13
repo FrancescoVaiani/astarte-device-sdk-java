@@ -1,16 +1,17 @@
 package org.astarteplatform.devicesdk.android.examples;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 
 public class MainActivity extends AppCompatActivity {
-  private String TAG = "MainActivity";
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
   /*
    * You should populate all this variables with the values you're using in your Astarte instance.
    *
@@ -89,11 +90,11 @@ public class MainActivity extends AppCompatActivity {
    * This callback gets called when the device is correctly initialized
    */
   public void onAstarteServiceInitialized() {
-    Log.i(TAG, "Astarte Device initialized");
+    logger.info("Astarte Device initialized");
     try {
       mDeviceService.connect();
     } catch (Exception e) {
-      Log.w(TAG, "Connection failed");
+      logger.info("Connection failed");
       e.printStackTrace();
     }
   }
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
    * setup.
    */
   public void onAstarteServiceError(Exception e) {
-    Log.w(TAG, "Astarte Device error");
+    logger.warning("Astarte Device error");
     e.printStackTrace();
   }
 }

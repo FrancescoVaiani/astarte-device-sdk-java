@@ -6,12 +6,16 @@ import org.astarteplatform.devicesdk.AstarteMessageListener;
 import org.astarteplatform.devicesdk.AstartePropertyStorage;
 import org.astarteplatform.devicesdk.AstartePropertyStorageException;
 import org.astarteplatform.devicesdk.crypto.AstarteCryptoException;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.AstarteAggregateDatastreamInterface;
 import org.astarteplatform.devicesdk.protocol.AstarteInterface;
 import org.astarteplatform.devicesdk.protocol.AstarteProtocol;
 import org.astarteplatform.devicesdk.protocol.AstarteProtocolType;
 
 public abstract class AstarteTransport implements AstarteProtocol {
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
+
   private final AstarteProtocolType m_astarteProtocolType;
   private AstarteDevice mDevice;
   protected boolean m_introspectionSent;
@@ -94,7 +98,7 @@ public abstract class AstarteTransport implements AstarteProtocol {
     if (m_propertyStorage != null) {
       m_propertyStorage.setStoredValue(interfaceName, path, value);
     } else {
-      System.err.println("Property storage invalid! Caching won't work");
+      logger.warning("Property storage invalid! Caching won't work");
     }
   }
 
@@ -103,7 +107,7 @@ public abstract class AstarteTransport implements AstarteProtocol {
     if (m_propertyStorage != null) {
       m_propertyStorage.removeStoredPath(interfaceName, path);
     } else {
-      System.err.println("Property storage invalid! Caching won't work");
+      logger.warning("Property storage invalid! Caching won't work");
     }
   }
 }

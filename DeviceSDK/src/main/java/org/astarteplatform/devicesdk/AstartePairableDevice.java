@@ -2,6 +2,8 @@ package org.astarteplatform.devicesdk;
 
 import org.astarteplatform.devicesdk.crypto.AstarteCryptoException;
 import org.astarteplatform.devicesdk.crypto.AstarteCryptoStore;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.AstarteInterface;
 import org.astarteplatform.devicesdk.protocol.AstarteInvalidInterfaceException;
 import org.astarteplatform.devicesdk.transport.AstarteFailedMessageStorage;
@@ -12,6 +14,8 @@ import org.json.JSONException;
 
 public abstract class AstartePairableDevice extends AstarteDevice
     implements AstarteTransportEventListener {
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
+
   private AstartePairingHandler mPairingHandler;
   private AstarteTransport mAstarteTransport;
   private AstarteMessageListener mAstarteMessageListener;
@@ -124,7 +128,7 @@ public abstract class AstartePairableDevice extends AstarteDevice
       try {
         mAstarteTransport.connect();
       } catch (AstarteCryptoException e) {
-        System.err.println("Regenerating the cert");
+        logger.warning("Regenerating the cert");
         // Generate the certificate and try again
         try {
           mPairingHandler.requestNewCertificate();
@@ -216,7 +220,7 @@ public abstract class AstartePairableDevice extends AstarteDevice
   public void onTransportConnectionError(Throwable cause) {
     synchronized (this) {
       if (cause instanceof AstarteCryptoException) {
-        System.err.println("Regenerating the cert");
+        logger.warning("Regenerating the cert");
         // Generate the certificate and try again
         try {
           mPairingHandler.requestNewCertificate();

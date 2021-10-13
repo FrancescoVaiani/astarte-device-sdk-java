@@ -8,6 +8,8 @@ import org.astarteplatform.devicesdk.AstarteDevice;
 import org.astarteplatform.devicesdk.AstarteDeviceIdUtils;
 import org.astarteplatform.devicesdk.AstartePairingService;
 import org.astarteplatform.devicesdk.generic.AstarteGenericDevice;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 import org.astarteplatform.devicesdk.protocol.AstarteDeviceDatastreamInterface;
 import org.astarteplatform.devicesdk.protocol.AstarteDevicePropertyInterface;
 import org.astarteplatform.devicesdk.transport.AstarteTransportException;
@@ -23,6 +25,9 @@ public class ExampleDevice {
     /*
      *  Initialization of needed parameters, reading them from the command line
      */
+
+    AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
+
     Options options = new Options();
 
     Option realmOpt = new Option("r", "realm", true, "The target Astarte realm");
@@ -56,7 +61,7 @@ public class ExampleDevice {
     try {
       cmd = parser.parse(options, args);
     } catch (ParseException e) {
-      System.out.println(e.getMessage());
+      logger.error(e.getMessage());
       formatter.printHelp("Astarte SDK Example", options);
 
       System.exit(1);
@@ -76,7 +81,7 @@ public class ExampleDevice {
       UUID uuidNamespace = UUID.fromString("f79ad91f-c638-4889-ae74-9d001a3b4cf8");
       String macAddress = "98:75:a8:0d:96:db";
       deviceId = AstarteDeviceIdUtils.generateId(uuidNamespace, macAddress);
-      System.out.println("deviceId: " + deviceId);
+      logger.info("deviceId: " + deviceId);
 
       credentialsSecret =
           new AstartePairingService(pairingUrl, realm).registerDevice(jwt, deviceId);
@@ -155,7 +160,7 @@ public class ExampleDevice {
 
     while (true) {
       double value = 20 + 10 * r.nextDouble();
-      System.out.println("Streaming value: " + value);
+      logger.debug("Streaming value: " + value);
       try {
         valuesInterface.streamData(path, value, DateTime.now());
       } catch (AstarteTransportException e) {

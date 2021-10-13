@@ -1,10 +1,11 @@
 package org.astarteplatform.devicesdk.android.examples;
 
-import android.util.Log;
 import org.astarteplatform.devicesdk.AstarteMessageListener;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogManager;
+import org.astarteplatform.devicesdk.logging.AstarteSDKLogger;
 
 public class ExampleMessageListener implements AstarteMessageListener {
-  private String TAG = "ExampleMessageListener";
+  AstarteSDKLogger logger = AstarteSDKLogManager.INSTANCE.getLogger();
   private MainActivity mActivity;
 
   public ExampleMessageListener(MainActivity activity) {
@@ -19,7 +20,7 @@ public class ExampleMessageListener implements AstarteMessageListener {
      *
      * When the connection is established, we enable the "Send ping" button.
      */
-    Log.i(TAG, "Device connected");
+    logger.info("Device connected");
     mActivity.enablePingButton(true);
   }
 
@@ -31,7 +32,7 @@ public class ExampleMessageListener implements AstarteMessageListener {
      *
      * If the connection is lost, we disable the "Send ping" button.
      */
-    Log.i(TAG, "Device disconnected: " + cause.getMessage());
+    logger.info("Device disconnected: " + cause.getMessage());
     mActivity.enablePingButton(false);
   }
 
@@ -41,6 +42,6 @@ public class ExampleMessageListener implements AstarteMessageListener {
      * This function gets called when the device encounters an error during its
      * lifetime.
      */
-    Log.w(TAG, "Device failure: " + cause.getMessage());
+    logger.warning("Device failure: " + cause.getMessage());
   }
 }
